@@ -1,30 +1,60 @@
-# Import the PDF parser
+from pathlib import Path
+
 from pdf_parser import extract_text_from_pdf
-
-# Import the DOCX parser
 from doc_parser import extract_text_from_docx
-
-# Import the section splitter
 from section_splitter import split_sections
+from contact_extractor import extract_contact_information
+from name_extractor import extract_name
 
 
-# Parse a resume file
+SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
+
+
 def parse_resume(file_path):
+    """
+    Parse a PDF or DOCX resume and return structured resume data.
+    """
 
-    # Check if the file is a PDF
-    if file_path.lower().endswith(".pdf"):
-        text = extract_text_from_pdf(file_path)
+    path = Path(file_path)
 
-    # Check if the file is a DOCX
-    elif file_path.lower().endswith(".docx"):
-        text = extract_text_from_docx(file_path)
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"Resume file not found: {file_path}"
+        )
 
-    # If the file type is not supported
+    extension = path.suffix.lower()
+
+    if extension not in SUPPORTED_EXTENSIONS:
+        raise ValueError(
+            f"Unsupported file type: {extension}. "
+            "Only PDF and DOCX files are supported."
+        )
+
+    # Extract raw text
+    if extension == ".pdf":
+        text = extract_text_from_pdf(str(path))
     else:
-        raise ValueError("Only PDF and DOCX files are supported.")
+        text = extract_text_from_docx(str(path))
 
-    # Split the extracted text into sections
+    if not text or not text.strip():
+        raise ValueError(
+            "The resume contains no readable text."
+        )
+
+    # Extract candidate information
+    name = extract_name(text)
+    contact = extract_contact_information(text)
+
+    # Split resume into sections
     sections = split_sections(text)
 
-    # Return the structured resume data
-    return sections
+    if not sections:
+        raise ValueError(
+            "No recognizable resume sections were found."
+        )
+
+    return {
+        "name": name,
+        "contact": contact,
+        "sections": sections
+    }
