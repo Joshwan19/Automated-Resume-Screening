@@ -1,7 +1,6 @@
 import re
 
 
-# Different headings commonly found in resumes
 SECTION_ALIASES = {
     "summary": {
         "SUMMARY",
@@ -75,40 +74,64 @@ SECTION_ALIASES = {
         "HOBBIES",
         "INTERESTS AND HOBBIES",
     },
+
+    "strengths": {
+        "STRENGTHS",
+        "KEY STRENGTHS",
+        "CORE STRENGTHS",
+        "PERSONAL STRENGTHS",
+    },
+
+    "extracurricular": {
+        "EXTRACURRICULAR ACTIVITIES",
+        "EXTRACURRICULAR",
+        "ACTIVITIES",
+    },
+
+    "volunteering": {
+        "VOLUNTEER EXPERIENCE",
+        "VOLUNTEERING",
+        "VOLUNTEER WORK",
+    },
+
+    "publications": {
+        "PUBLICATIONS",
+        "RESEARCH PUBLICATIONS",
+        "PAPERS",
+    },
+
+    "declaration": {
+        "DECLARATION",
+    },
+
+    "personal_details": {
+        "PERSONAL DETAILS",
+        "PERSONAL INFORMATION",
+    },
+
+    "references": {
+        "REFERENCES",
+        "REFERENCE",
+    },
 }
 
 
 def normalize_heading(line):
-    """
-    Normalize a possible resume heading.
-    """
-
-    # Remove leading/trailing whitespace
     heading = line.strip()
 
-    # Remove common numbering/bullet formats
     heading = re.sub(
         r"^(?:\d+(?:\.\d+)*[\s.)-]+|[-•▪●]\s*)",
         "",
         heading
     )
 
-    # Remove trailing colon
     heading = heading.rstrip(":")
-
-    # Normalize multiple spaces
     heading = re.sub(r"\s+", " ", heading)
 
-    # Convert to uppercase
     return heading.upper().strip()
 
 
 def detect_section_heading(line):
-    """
-    Return the internal section name if the line
-    is a recognized resume heading.
-    """
-
     heading = normalize_heading(line)
 
     for section, aliases in SECTION_ALIASES.items():
@@ -119,10 +142,6 @@ def detect_section_heading(line):
 
 
 def split_sections(text):
-    """
-    Split extracted resume text into structured sections.
-    """
-
     sections = {}
     current_section = None
 
@@ -130,28 +149,22 @@ def split_sections(text):
 
         line = line.strip()
 
-        # Ignore empty lines
         if not line:
             continue
 
-        # Check whether this line is a section heading
         detected_section = detect_section_heading(line)
 
         if detected_section:
-
             current_section = detected_section
 
-            # Create section only once
             if current_section not in sections:
                 sections[current_section] = ""
 
             continue
 
-        # Add normal content to the current section
         if current_section:
             sections[current_section] += line + "\n"
 
-    # Remove unnecessary trailing whitespace
     for section in sections:
         sections[section] = sections[section].strip()
 

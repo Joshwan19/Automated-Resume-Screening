@@ -1,11 +1,13 @@
+import sys
 from pathlib import Path
 
-from resume_parser import parse_resume
+project_root = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(project_root))
+
+from src.parser.resume_parser import parse_resume
 
 
 def test_integrated_resume_parser():
-
-    project_root = Path(__file__).resolve().parents[2]
 
     docx_path = (
         project_root
@@ -28,7 +30,7 @@ def test_integrated_resume_parser():
     assert resume_data["contact"]["email"] == "jane.doe@example.com"
     assert resume_data["contact"]["phone"] == "9876543210"
 
-    # Check important sections
+    # Check expected sections
     sections = resume_data["sections"]
 
     expected_sections = [
@@ -62,5 +64,4 @@ def test_integrated_resume_parser():
 
 if __name__ == "__main__":
     test_integrated_resume_parser()
-
     print("\nAll integrated parser tests passed!")

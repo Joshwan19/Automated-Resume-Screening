@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from pdf_parser import extract_text_from_pdf
-from doc_parser import extract_text_from_docx
-from section_splitter import split_sections
-from contact_extractor import extract_contact_information
-from name_extractor import extract_name
+from .pdf_parser import extract_text_from_pdf
+from .doc_parser import extract_text_from_docx
+from .section_splitter import split_sections
+from .contact_extractor import extract_contact_information
+from .name_extractor import extract_name
 
 
 SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
